@@ -14,6 +14,10 @@ Detecta claves expuestas, Supabase sin RLS, CORS abierto, CVEs, inyección SQL y
 
 [**⬇️ Descargar para macOS**](../../releases/latest) · [Características](#-características) · [Cómo funciona](#-cómo-funciona)
 
+<br/>
+
+<img src="screenshots/screenshot-web.png" alt="VibeAuditt — Nueva auditoría" width="840">
+
 </div>
 
 ---
@@ -23,6 +27,21 @@ Detecta claves expuestas, Supabase sin RLS, CORS abierto, CVEs, inyección SQL y
 Las herramientas de IA (Lovable, Bolt, v0, Cursor, Claude Code…) generan apps que **funcionan**, pero rara vez son **seguras por defecto**: claves hardcodeadas en el bundle, Supabase sin Row Level Security, CORS abierto, headers ausentes…
 
 **VibeAuditt** es una app de escritorio para macOS que las detecta — y en modo profundo, **demuestra cómo se explotarían, sin romper nada.**
+
+## 📸 Capturas
+
+<table>
+<tr>
+<td width="50%" valign="top">
+<img src="screenshots/screenshot-pentest.png" alt="Modo Pentest profundo">
+<br/><sub><b>Pentest profundo</b> — CVEs, subdominios reales, inyección y cadena de ataque.</sub>
+</td>
+<td width="50%" valign="top">
+<img src="screenshots/screenshot-database.png" alt="Auditoría de base de datos">
+<br/><sub><b>Auditoría de base de datos</b> — conecta a tu PostgreSQL/Supabase y audita RLS, roles y permisos.</sub>
+</td>
+</tr>
+</table>
 
 ## ✨ Características
 
