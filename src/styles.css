@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   Fuentes self-hosted (las mismas que vibeauditt.com)
+   =========================================================================== */
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* ===========================================================================
+   Tokens de tema — DARK por defecto (idéntico a vibeauditt.com)
+   =========================================================================== */
+:root {
+  color-scheme: dark;
+
+  --bg-base: #0a0a0b;
+  --bg-surface: #131316;
+  --bg-elevated: #1c1c1f;
+  --bg-overlay: #000000b3;
+
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-inverse: #18181b;
+
+  --border-subtle: #27272a;
+  --border-default: #3f3f46;
+  --border-strong: #52525b;
+
+  --accent-primary: #84cc16;
+  --accent-primary-hover: #a3e635;
+  --accent-primary-fg: #18181b;
+  --accent-text: var(--accent-primary);
+
+  /* Severidades (color sólido · bg 10% · border 30%) */
+  --sev-critical: #ef4444;
+  --sev-critical-bg: #ef44441a;
+  --sev-critical-border: #ef44444d;
+  --sev-high: #f59e0b;
+  --sev-high-bg: #f59e0b1a;
+  --sev-high-border: #f59e0b4d;
+  --sev-medium: #eab308;
+  --sev-medium-bg: #eab3081a;
+  --sev-medium-border: #eab3084d;
+  --sev-low: #3b82f6;
+  --sev-low-bg: #3b82f61a;
+  --sev-low-border: #3b82f64d;
+  --sev-info: #71717a;
+  --sev-info-bg: #71717a1a;
+  --sev-info-border: #71717a4d;
+  --sev-clean: #84cc16;
+  --sev-clean-bg: #84cc161a;
+  --sev-clean-border: #84cc164d;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-base: #ffffff;
+  --bg-surface: #fafafa;
+  --bg-elevated: #f4f4f5;
+  --bg-overlay: #00000080;
+
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #6b6b73;
+  --text-inverse: #fafafa;
+
+  --border-subtle: #e4e4e7;
+  --border-default: #d4d4d8;
+  --border-strong: #a1a1aa;
+
+  --accent-text: #3f6212;
+
+  --sev-critical: #b91c1c;
+  --sev-high: #b45309;
+  --sev-medium: #a16207;
+  --sev-low: #1d4ed8;
+  --sev-info: #52525b;
+  --sev-clean: #3f6212;
+}
+
+/* ===========================================================================
+   Tokens Tailwind v4 (fuentes para utilidades font-sans / font-mono)
+   =========================================================================== */
+@theme {
+  --font-sans: "Inter", "Inter Fallback", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Monaco,
+    Consolas, monospace;
+}
+
+/* ===========================================================================
+   Base
+   =========================================================================== */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* La app es un escritorio: nada de selección accidental del chrome ni rebote */
+:root {
+  overscroll-behavior: none;
+}
+
+/* Scrollbars sutiles, coherentes con el tema */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-default);
+  border-radius: 9999px;
+  border: 2px solid var(--bg-base);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--border-strong);
+}
+
+/* Focus visible accesible con el acento */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Animación de entrada reutilizable */
+@keyframes va-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.va-fade-in {
+  animation: va-fade-in 0.25s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
