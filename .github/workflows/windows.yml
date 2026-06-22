@@ -1,7 +1,15 @@
 name: Build Windows
 
 on:
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag existente a publicar (ej. v0.1.0)"
+        required: true
+        default: v0.1.0
 
 permissions:
   contents: write
@@ -40,7 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v0.1.0
-          releaseName: VibeAuditt v0.1.0
+          tagName: ${{ github.event.inputs.tag || github.ref_name }}
+          releaseName: VibeAuditt ${{ github.event.inputs.tag || github.ref_name }}
           releaseBody: Instaladores para macOS (firmado y notarizado por Apple) y Windows.
           args: --bundles nsis
