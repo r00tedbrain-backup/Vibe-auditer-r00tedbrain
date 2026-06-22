@@ -25,7 +25,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "dmg"],
+    "targets": "all",
     "category": "DeveloperTool",
     "copyright": "© 2026 VibeAuditt",
     "shortDescription": "Auditor de seguridad para SaaS hechos con IA",
