@@ -7,6 +7,7 @@
 Detecta claves expuestas, Supabase sin RLS, CORS abierto, CVEs, inyección SQL y mucho más — sin instalar nada en tu servidor.
 
 ![macOS](https://img.shields.io/badge/macOS-11%2B-black?logo=apple)
+![Windows](https://img.shields.io/badge/Windows-x64-0078D6?logo=windows)
 ![Tauri](https://img.shields.io/badge/Tauri-v2-24C8DB?logo=tauri)
 ![Rust](https://img.shields.io/badge/engine-Rust-orange?logo=rust)
 ![Notarized](https://img.shields.io/badge/Apple-notarized-success?logo=apple)
@@ -74,11 +75,17 @@ Conecta a tu **PostgreSQL / Supabase** con credenciales y audita su configuraci�
 
 ## ⬇️ Instalación
 
-1. Descarga el `.dmg` de la [**última release**](../../releases/latest).
-2. Ábrelo y arrastra **VibeAuditt** a tu carpeta de Aplicaciones.
-3. Está **firmado y notarizado por Apple** → se abre sin avisos de Gatekeeper.
+Descarga la [**última release**](../../releases/latest):
 
-> **Requisitos:** macOS 11 (Big Sur) o superior · Apple Silicon.
+### macOS (`.dmg`)
+1. Descarga `VibeAuditt_x.y.z_aarch64.dmg`, ábrelo y arrastra **VibeAuditt** a Aplicaciones.
+2. Está **firmado y notarizado por Apple** → se abre sin avisos de Gatekeeper.
+> Requiere macOS 11 (Big Sur) o superior · Apple Silicon.
+
+### Windows (`.exe`)
+1. Descarga `VibeAuditt_x.y.z_x64-setup.exe` y ejecútalo.
+2. El instalador **aún no está firmado**, así que SmartScreen mostrará un aviso: pulsa **"Más información" → "Ejecutar de todas formas"**.
+> Requiere Windows 10/11 (x64) · WebView2 (incluido en Windows 11 y en Windows 10 actualizado).
 
 ## 🚀 Cómo funciona
 
