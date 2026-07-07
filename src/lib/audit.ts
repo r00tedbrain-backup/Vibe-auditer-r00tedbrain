@@ -27,6 +27,11 @@ export function auditDatabase(
   return invoke<AuditReport>("audit_database", { connection, consent });
 }
 
+/** Escanea una API (URL base) buscando vulnerabilidades, sin auth y no destructivo. */
+export function scanApi(base: string, consent: boolean): Promise<AuditReport> {
+  return invoke<AuditReport>("scan_api", { base, consent });
+}
+
 /** Histórico de auditorías guardadas (resumen, sin findings). */
 export function listAudits(): Promise<AuditSummary[]> {
   return invoke<AuditSummary[]>("list_audits");

@@ -31,6 +31,27 @@ async fn audit_real_site_deep() {
     assert!(!all.is_empty(), "el motor no devolvió ningún finding");
 }
 
+/// Valida que el escaneo de API descubre endpoints y produce hallazgos.
+#[tokio::test]
+#[ignore]
+async fn api_scan_smoke() {
+    let report = crate::engine::api_scan::scan_api(
+        "https://jsonplaceholder.typicode.com",
+        AuditMode::Deep,
+    )
+    .await
+    .expect("api scan");
+    println!(
+        "API scan → {} findings · score {}/100",
+        report.findings.len(),
+        report.score
+    );
+    for f in &report.findings {
+        println!("  {:?}  {}", f.severity, f.title);
+    }
+    assert!(!report.findings.is_empty(), "el escaneo de API no devolvió nada");
+}
+
 /// Valida que la integración con OSV.dev devuelve CVEs reales.
 #[tokio::test]
 #[ignore]

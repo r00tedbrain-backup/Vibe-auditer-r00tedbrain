@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import {
   AlertTriangle,
+  Braces,
   Crosshair,
   Database,
   Globe,
@@ -27,7 +28,7 @@ function hostOf(s: string): string {
   }
 }
 
-type Target = "web" | "db";
+type Target = "web" | "db" | "api";
 
 export function NewAuditView({
   running,
@@ -35,24 +36,28 @@ export function NewAuditView({
   error,
   onRun,
   onRunDb,
+  onRunApi,
 }: {
   running: boolean;
   progress: ProgressEvent | null;
   error: string | null;
   onRun: (url: string, mode: AuditMode, consent: boolean) => void;
   onRunDb: (connection: string, consent: boolean) => void;
+  onRunApi: (base: string, consent: boolean) => void;
 }) {
   const [target, setTarget] = useState<Target>("web");
   const [url, setUrl] = useState("");
   const [mode, setMode] = useState<AuditMode>("passive");
   const [consent, setConsent] = useState(false);
   const [conn, setConn] = useState("");
+  const [apiUrl, setApiUrl] = useState("");
   const [showDeepModal, setShowDeepModal] = useState(false);
 
   const trimmed = url.trim();
   const valid = isValidHttpUrl(trimmed);
   const canRunWeb = valid && consent && !running;
   const canRunDb = conn.trim().length > 10 && consent && !running;
+  const canRunApi = apiUrl.trim().length > 3 && consent && !running;
 
   function submitWeb() {
     if (!canRunWeb) return;
@@ -77,14 +82,22 @@ export function NewAuditView({
       </p>
 
       {/* Selector de objetivo */}
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <TargetCard
           active={target === "web"}
           disabled={running}
           onClick={() => setTarget("web")}
           icon={<Globe className="h-5 w-5" />}
           title="Aplicación web"
-          desc="Audita una URL pública (headers, secretos, inyección, subdominios…)."
+          desc="Audita una URL pública: headers, secretos, inyección, subdominios…"
+        />
+        <TargetCard
+          active={target === "api"}
+          disabled={running}
+          onClick={() => setTarget("api")}
+          icon={<Braces className="h-5 w-5" />}
+          title="API"
+          desc="Escanea una API por su URL: endpoints sin auth, PII, inyección y CORS."
         />
         <TargetCard
           active={target === "db"}
@@ -92,11 +105,11 @@ export function NewAuditView({
           onClick={() => setTarget("db")}
           icon={<Database className="h-5 w-5" />}
           title="Base de datos"
-          desc="Conecta a tu PostgreSQL/Supabase y audita RLS, roles, permisos y SSL."
+          desc="Conecta a tu PostgreSQL/Supabase y audita RLS, roles y permisos."
         />
       </div>
 
-      {target === "web" ? (
+      {target === "web" && (
         <div className="mt-6 space-y-5">
           <div>
             <label
@@ -192,7 +205,9 @@ export function NewAuditView({
             )}
           </button>
         </div>
-      ) : (
+      )}
+
+      {target === "db" && (
         <div className="mt-6 space-y-5">
           <div>
             <label
@@ -235,6 +250,57 @@ export function NewAuditView({
               </>
             ) : (
               "Auditar base de datos"
+            )}
+          </button>
+        </div>
+      )}
+
+      {target === "api" && (
+        <div className="mt-6 space-y-5">
+          <div>
+            <label
+              htmlFor="api-url"
+              className="mb-1.5 block text-sm font-medium"
+              style={{ color: "var(--text-primary)" }}
+            >
+              URL base de la API
+            </label>
+            <input
+              id="api-url"
+              type="url"
+              inputMode="url"
+              autoComplete="url"
+              placeholder="https://api.tu-saas.com"
+              value={apiUrl}
+              onChange={(e) => setApiUrl(e.currentTarget.value)}
+              disabled={running}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canRunApi) onRunApi(apiUrl.trim(), consent);
+              }}
+              className="h-12 w-full rounded-md border bg-transparent px-4 text-base outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] disabled:opacity-60"
+              style={{ borderColor: "var(--border-default)", color: "var(--text-primary)" }}
+            />
+            <p className="mt-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
+              Busca la especificación OpenAPI/Swagger y prueba rutas de API comunes. Sin
+              autenticación y sin modificar datos.
+            </p>
+          </div>
+
+          <ConsentBox consent={consent} setConsent={setConsent} running={running} kind="esta API" />
+
+          <button
+            type="button"
+            disabled={!canRunApi}
+            onClick={() => canRunApi && onRunApi(apiUrl.trim(), consent)}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-md px-6 text-base font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: "var(--accent-primary)", color: "var(--accent-primary-fg)" }}
+          >
+            {running ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" /> Escaneando API…
+              </>
+            ) : (
+              "Escanear API"
             )}
           </button>
         </div>

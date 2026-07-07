@@ -12,6 +12,7 @@ import {
   listAudits,
   onAuditProgress,
   runAudit,
+  scanApi,
 } from "./lib/audit";
 import { Sidebar } from "./components/Sidebar";
 import { NewAuditView } from "./components/NewAuditView";
@@ -89,6 +90,25 @@ function App() {
     [refresh],
   );
 
+  const handleRunApi = useCallback(
+    async (base: string, consent: boolean) => {
+      setError(null);
+      setRunning(true);
+      setProgress(null);
+      try {
+        const r = await scanApi(base, consent);
+        setReport(r);
+        setView("report");
+        await refresh();
+      } catch (e) {
+        setError(typeof e === "string" ? e : "No se pudo escanear la API.");
+      } finally {
+        setRunning(false);
+      }
+    },
+    [refresh],
+  );
+
   const handleSelect = useCallback(async (id: string) => {
     try {
       const r = await getAudit(id);
@@ -141,6 +161,7 @@ function App() {
             error={error}
             onRun={handleRun}
             onRunDb={handleRunDb}
+            onRunApi={handleRunApi}
           />
         )}
       </main>

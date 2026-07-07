@@ -26,6 +26,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::run_audit,
             commands::audit_database,
+            commands::scan_api,
             commands::list_audits,
             commands::get_audit,
             commands::delete_audit,

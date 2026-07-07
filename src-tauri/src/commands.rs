@@ -5,6 +5,7 @@ use tauri::{AppHandle, State};
 use tauri_plugin_dialog::DialogExt;
 
 use crate::db::Db;
+use crate::engine::api_scan;
 use crate::engine::context::build_client;
 use crate::engine::db_audit;
 use crate::engine::ruleset::{
@@ -75,6 +76,25 @@ pub async fn audit_database(
         );
     }
     let report = db_audit::audit_database(&connection).await?;
+    {
+        let db = db.lock().map_err(|_| LOCK_ERR.to_string())?;
+        db.save(&report)?;
+    }
+    Ok(report)
+}
+
+/// Escanea una API (URL base) buscando vulnerabilidades, sin autenticación y de
+/// forma no destructiva: endpoints sin auth, exposición de PII, inyección y CORS.
+#[tauri::command]
+pub async fn scan_api(
+    db: State<'_, Mutex<Db>>,
+    base: String,
+    consent: bool,
+) -> Result<AuditReport, String> {
+    if !consent {
+        return Err("Debes confirmar que tienes autorización para auditar esta API.".to_string());
+    }
+    let report = api_scan::scan_api(&base, AuditMode::Deep).await?;
     {
         let db = db.lock().map_err(|_| LOCK_ERR.to_string())?;
         db.save(&report)?;
