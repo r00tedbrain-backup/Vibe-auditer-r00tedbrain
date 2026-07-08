@@ -1,6 +1,6 @@
 [package]
 name = "vibeauditt-desktop"
-version = "0.2.0"
+version = "0.2.1"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
@@ -37,4 +37,5 @@ tokio-postgres = "0.7.18"
 postgres-native-tls = "0.5.3"
 native-tls = "0.2.18"
 walkdir = "2.5.0"
+printpdf = { version = "0.7", default-features = false }
 

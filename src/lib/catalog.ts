@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import type { AuditReport } from "./types";
 
 export interface CatalogInfo {
   totalSecretRules: number;
@@ -25,13 +26,10 @@ export function updateCatalog(): Promise<CatalogUpdate> {
   return invoke<CatalogUpdate>("update_catalog");
 }
 
-/** Abre el diálogo nativo y guarda el PDF. Devuelve la ruta o null si se cancela. */
-export function saveReportPdf(
-  bytes: Uint8Array,
-  filename: string,
-): Promise<string | null> {
-  return invoke<string | null>("save_report_pdf", {
-    bytes: Array.from(bytes),
-    filename,
-  });
+/**
+ * Genera el PDF del reporte (en Rust) y abre el diálogo nativo de guardado.
+ * Devuelve la ruta guardada o null si se cancela.
+ */
+export function saveReportPdf(report: AuditReport): Promise<string | null> {
+  return invoke<string | null>("save_report_pdf", { report });
 }

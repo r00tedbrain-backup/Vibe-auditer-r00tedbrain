@@ -206,14 +206,16 @@ pub async fn update_catalog(db: State<'_, Mutex<Db>>) -> Result<CatalogUpdate, S
 // Exportar PDF (el frontend genera los bytes; aquí abrimos el diálogo y guardamos)
 // ---------------------------------------------------------------------------
 
-/// Abre un diálogo nativo "Guardar como" y escribe los bytes del PDF.
+/// Genera el PDF del reporte (en Rust) y abre el diálogo nativo "Guardar como".
 /// Devuelve la ruta guardada o None si el usuario cancela.
 #[tauri::command]
 pub async fn save_report_pdf(
     app: AppHandle,
-    bytes: Vec<u8>,
-    filename: String,
+    report: AuditReport,
 ) -> Result<Option<String>, String> {
+    let bytes = crate::engine::pdf::generate(&report)?;
+    let filename = pdf_filename(&report.url);
+
     let file_path = app
         .dialog()
         .file()
@@ -229,4 +231,18 @@ pub async fn save_report_pdf(
         }
         None => Ok(None),
     }
+}
+
+fn pdf_filename(url: &str) -> String {
+    let host = url
+        .replace("https://", "")
+        .replace("http://", "")
+        .replace("code://", "");
+    let clean: String = host
+        .chars()
+        .map(|c| if c.is_alphanumeric() || c == '.' || c == '-' { c } else { '_' })
+        .take(40)
+        .collect();
+    let clean = clean.trim_matches('_');
+    format!("vibeauditt-{}.pdf", if clean.is_empty() { "informe" } else { clean })
 }

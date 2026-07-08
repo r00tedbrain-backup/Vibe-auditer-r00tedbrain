@@ -31,11 +31,14 @@ export function ReportView({
   async function handleExport() {
     setExporting(true);
     try {
-      // Carga react-pdf solo al exportar (no infla el arranque de la app).
-      const { exportReportPdf } = await import("./ReportPdf");
-      await exportReportPdf(report);
-    } catch {
-      /* cancelado o error de guardado */
+      const { saveReportPdf } = await import("../lib/catalog");
+      await saveReportPdf(report);
+    } catch (e) {
+      console.error("PDF export failed:", e);
+      alert(
+        "No se pudo generar el PDF: " +
+          (typeof e === "string" ? e : "error interno"),
+      );
     } finally {
       setExporting(false);
     }

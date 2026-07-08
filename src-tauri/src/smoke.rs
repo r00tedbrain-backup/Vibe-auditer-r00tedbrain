@@ -31,6 +31,39 @@ async fn audit_real_site_deep() {
     assert!(!all.is_empty(), "el motor no devolvió ningún finding");
 }
 
+/// Valida que la generación de PDF produce un PDF válido (sin red).
+#[test]
+fn pdf_generation() {
+    use crate::engine::types::{
+        AuditMode, AuditReport, Finding, Severity, SeverityCounts,
+    };
+    let f = Finding::new("api_unauth", 1, "Endpoint accesible sin autenticación", "API", Severity::High)
+        .summary("Devuelve datos JSON sin token. Expone posible PII: email.")
+        .add_evidence("GET /api/users → 200, 4213 bytes de JSON")
+        .poc("GET /api/users sin cabecera Authorization devuelve datos.")
+        .attack_chain(&["Llamo al endpoint sin token.", "Recibo datos.", "Itero IDs y exfiltro."])
+        .remediation("Exige autenticación en el servidor para todo endpoint que devuelva datos.")
+        .refs(&["OWASP API1:2023", "CWE-306"]);
+    let report = AuditReport {
+        id: "test".into(),
+        url: "https://api.example.com".into(),
+        final_url: "https://api.example.com".into(),
+        mode: AuditMode::Deep,
+        created_at: "2026-07-08T15:00:00Z".into(),
+        duration_ms: 1234,
+        score: 45,
+        grade: "D".into(),
+        counts: SeverityCounts { critical: 0, high: 1, medium: 0, low: 0, info: 0 },
+        findings: vec![f],
+        checks_run: 18,
+    };
+    let bytes = crate::engine::pdf::generate(&report).expect("pdf generation");
+    println!("PDF generado: {} bytes", bytes.len());
+    std::fs::write("/tmp/vibeauditt-test.pdf", &bytes).ok();
+    assert!(bytes.starts_with(b"%PDF"), "no es un PDF válido");
+    assert!(bytes.len() > 1000, "PDF demasiado pequeño");
+}
+
 /// Valida que el escaneo de código local recorre archivos sin panic.
 #[tokio::test]
 #[ignore]

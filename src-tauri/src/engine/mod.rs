@@ -3,6 +3,7 @@ pub mod checks;
 pub mod code_scan;
 pub mod context;
 pub mod db_audit;
+pub mod pdf;
 pub mod ruleset;
 pub mod runner;
 pub mod score;
