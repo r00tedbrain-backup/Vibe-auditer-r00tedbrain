@@ -31,6 +31,25 @@ async fn audit_real_site_deep() {
     assert!(!all.is_empty(), "el motor no devolvió ningún finding");
 }
 
+/// Valida que el escaneo de código local recorre archivos sin panic.
+#[tokio::test]
+#[ignore]
+async fn code_scan_smoke() {
+    let report = crate::engine::code_scan::scan_code("../src")
+        .await
+        .expect("code scan");
+    println!(
+        "Code scan → {} archivos · {} findings · score {}/100",
+        report.checks_run,
+        report.findings.len(),
+        report.score
+    );
+    for f in &report.findings {
+        println!("  {:?}  {}", f.severity, f.title);
+    }
+    assert!(report.checks_run > 0, "no se escaneó ningún archivo");
+}
+
 /// Valida que el escaneo de API descubre endpoints y produce hallazgos.
 #[tokio::test]
 #[ignore]

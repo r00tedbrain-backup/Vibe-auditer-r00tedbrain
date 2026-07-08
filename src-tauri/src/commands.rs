@@ -6,6 +6,7 @@ use tauri_plugin_dialog::DialogExt;
 
 use crate::db::Db;
 use crate::engine::api_scan;
+use crate::engine::code_scan;
 use crate::engine::context::build_client;
 use crate::engine::db_audit;
 use crate::engine::ruleset::{
@@ -95,6 +96,21 @@ pub async fn scan_api(
         return Err("Debes confirmar que tienes autorización para auditar esta API.".to_string());
     }
     let report = api_scan::scan_api(&base, AuditMode::Deep).await?;
+    {
+        let db = db.lock().map_err(|_| LOCK_ERR.to_string())?;
+        db.save(&report)?;
+    }
+    Ok(report)
+}
+
+/// Escanea el código fuente de un proyecto local (SAST): secretos, funciones
+/// Convex sin auth, patrones peligrosos, reglas de Firebase y .env.
+#[tauri::command]
+pub async fn scan_code(
+    db: State<'_, Mutex<Db>>,
+    path: String,
+) -> Result<AuditReport, String> {
+    let report = code_scan::scan_code(&path).await?;
     {
         let db = db.lock().map_err(|_| LOCK_ERR.to_string())?;
         db.save(&report)?;

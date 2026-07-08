@@ -36,4 +36,5 @@ tauri-plugin-dialog = "2.7.1"
 tokio-postgres = "0.7.18"
 postgres-native-tls = "0.5.3"
 native-tls = "0.2.18"
+walkdir = "2.5.0"
 

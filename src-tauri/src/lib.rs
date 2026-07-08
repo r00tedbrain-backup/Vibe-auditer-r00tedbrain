@@ -27,6 +27,7 @@ pub fn run() {
             commands::run_audit,
             commands::audit_database,
             commands::scan_api,
+            commands::scan_code,
             commands::list_audits,
             commands::get_audit,
             commands::delete_audit,

@@ -1,5 +1,6 @@
 pub mod api_scan;
 pub mod checks;
+pub mod code_scan;
 pub mod context;
 pub mod db_audit;
 pub mod ruleset;

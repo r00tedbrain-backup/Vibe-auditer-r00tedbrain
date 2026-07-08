@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { open } from "@tauri-apps/plugin-dialog";
 import type {
   AuditMode,
   AuditReport,
@@ -30,6 +31,21 @@ export function auditDatabase(
 /** Escanea una API (URL base) buscando vulnerabilidades, sin auth y no destructivo. */
 export function scanApi(base: string, consent: boolean): Promise<AuditReport> {
   return invoke<AuditReport>("scan_api", { base, consent });
+}
+
+/** Abre el diálogo nativo para elegir una carpeta. Devuelve la ruta o null. */
+export async function pickFolder(): Promise<string | null> {
+  const selected = await open({
+    directory: true,
+    multiple: false,
+    title: "Selecciona la carpeta del proyecto",
+  });
+  return typeof selected === "string" ? selected : null;
+}
+
+/** Escanea el código fuente de un proyecto local (SAST). */
+export function scanCode(path: string): Promise<AuditReport> {
+  return invoke<AuditReport>("scan_code", { path });
 }
 
 /** Histórico de auditorías guardadas (resumen, sin findings). */

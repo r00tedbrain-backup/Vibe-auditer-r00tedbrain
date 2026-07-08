@@ -2,14 +2,17 @@ import { useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   Braces,
+  Code2,
   Crosshair,
   Database,
+  FolderOpen,
   Globe,
   Loader2,
   ScanSearch,
   Zap,
 } from "lucide-react";
 import type { AuditMode, ProgressEvent } from "../lib/types";
+import { pickFolder } from "../lib/audit";
 
 function isValidHttpUrl(s: string): boolean {
   try {
@@ -28,7 +31,7 @@ function hostOf(s: string): string {
   }
 }
 
-type Target = "web" | "db" | "api";
+type Target = "web" | "db" | "api" | "code";
 
 export function NewAuditView({
   running,
@@ -37,6 +40,7 @@ export function NewAuditView({
   onRun,
   onRunDb,
   onRunApi,
+  onRunCode,
 }: {
   running: boolean;
   progress: ProgressEvent | null;
@@ -44,6 +48,7 @@ export function NewAuditView({
   onRun: (url: string, mode: AuditMode, consent: boolean) => void;
   onRunDb: (connection: string, consent: boolean) => void;
   onRunApi: (base: string, consent: boolean) => void;
+  onRunCode: (path: string) => void;
 }) {
   const [target, setTarget] = useState<Target>("web");
   const [url, setUrl] = useState("");
@@ -51,6 +56,7 @@ export function NewAuditView({
   const [consent, setConsent] = useState(false);
   const [conn, setConn] = useState("");
   const [apiUrl, setApiUrl] = useState("");
+  const [codePath, setCodePath] = useState<string | null>(null);
   const [showDeepModal, setShowDeepModal] = useState(false);
 
   const trimmed = url.trim();
@@ -58,6 +64,7 @@ export function NewAuditView({
   const canRunWeb = valid && consent && !running;
   const canRunDb = conn.trim().length > 10 && consent && !running;
   const canRunApi = apiUrl.trim().length > 3 && consent && !running;
+  const canRunCode = !!codePath && !running;
 
   function submitWeb() {
     if (!canRunWeb) return;
@@ -66,6 +73,11 @@ export function NewAuditView({
       return;
     }
     onRun(trimmed, mode, consent);
+  }
+
+  async function pickProject() {
+    const p = await pickFolder();
+    if (p) setCodePath(p);
   }
 
   return (
@@ -82,7 +94,7 @@ export function NewAuditView({
       </p>
 
       {/* Selector de objetivo */}
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <TargetCard
           active={target === "web"}
           disabled={running}
@@ -106,6 +118,14 @@ export function NewAuditView({
           icon={<Database className="h-5 w-5" />}
           title="Base de datos"
           desc="Conecta a tu PostgreSQL/Supabase y audita RLS, roles y permisos."
+        />
+        <TargetCard
+          active={target === "code"}
+          disabled={running}
+          onClick={() => setTarget("code")}
+          icon={<Code2 className="h-5 w-5" />}
+          title="Código"
+          desc="Escanea el código de tu proyecto local: secretos, Convex sin auth, patrones peligrosos."
         />
       </div>
 
@@ -301,6 +321,58 @@ export function NewAuditView({
               </>
             ) : (
               "Escanear API"
+            )}
+          </button>
+        </div>
+      )}
+
+      {target === "code" && (
+        <div className="mt-6 space-y-5">
+          <div>
+            <label
+              className="mb-1.5 block text-sm font-medium"
+              style={{ color: "var(--text-primary)" }}
+            >
+              Carpeta del proyecto
+            </label>
+            <button
+              type="button"
+              onClick={pickProject}
+              disabled={running}
+              className="inline-flex h-12 w-full items-center gap-2 rounded-md border bg-transparent px-4 text-left text-base outline-none transition-colors hover:bg-[var(--bg-elevated)] disabled:opacity-60"
+              style={{
+                borderColor: "var(--border-default)",
+                color: codePath ? "var(--text-primary)" : "var(--text-muted)",
+              }}
+            >
+              <FolderOpen
+                className="h-5 w-5 shrink-0"
+                style={{ color: "var(--text-secondary)" }}
+              />
+              <span className="truncate font-mono text-sm">
+                {codePath ?? "Elegir carpeta…"}
+              </span>
+            </button>
+            <p className="mt-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
+              Analiza tu código en local (SAST): secretos hardcodeados, funciones Convex sin
+              autenticación, reglas de Firebase abiertas y patrones peligrosos. Ideal para apps
+              móviles (Expo) sin URL pública. Nada sale de tu equipo.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            disabled={!canRunCode}
+            onClick={() => codePath && onRunCode(codePath)}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-md px-6 text-base font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: "var(--accent-primary)", color: "var(--accent-primary-fg)" }}
+          >
+            {running ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" /> Escaneando código…
+              </>
+            ) : (
+              "Escanear código"
             )}
           </button>
         </div>
