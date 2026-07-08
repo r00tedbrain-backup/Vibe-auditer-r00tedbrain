@@ -6,6 +6,7 @@ use super::types::Finding;
 pub mod active_scan;
 pub mod backends;
 pub mod client_side;
+pub mod convex;
 pub mod cookies;
 pub mod cors;
 pub mod deps_cve;
@@ -77,6 +78,10 @@ pub fn registry() -> Vec<CheckDef> {
         CheckDef {
             name: "Firebase",
             run: |c| Box::pin(backends::firebase(c)),
+        },
+        CheckDef {
+            name: "Backend Convex",
+            run: |c| Box::pin(convex::run(c)),
         },
         CheckDef {
             name: "Endpoints sin autenticación",
